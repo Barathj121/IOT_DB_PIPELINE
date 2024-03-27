@@ -23,6 +23,13 @@ app.add_middleware(
 class Sensor(BaseModel):
     value: float
 
+class Alert(BaseModel):
+    lat: float
+    lng: float
+    homeLat: float
+    homeLng: float
+    userId: int
+
 @app.post("/")
 async def root():
     return {"message": "Hello World"}
@@ -47,6 +54,39 @@ async def create_sensor_data(sensor: Sensor):
             VALUES (%s, %s)
             """,
             (now, sensor.value)
+        )
+
+        # Commit the changes
+        conn.commit()
+
+        return {"status": "success"}
+
+    except (Exception, psycopg2.Error) as error:
+        return {"status": "error", "detail": str(error)}
+
+    finally:
+        # Close communication with the database
+        if conn:
+            cur.close()
+            conn.close()
+
+@app.post("/alert")
+async def create_alert(alert: Alert):
+    conn = None
+    try:
+        # Connect to your postgres DB
+        conn = psycopg2.connect(DATABASE_URL)
+
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+
+        # Insert alert data into the table
+        cur.execute(
+            """
+            INSERT INTO iot_project (lat, lng, homeLat, homeLng, userId)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (alert.lat, alert.lng, alert.homeLat, alert.homeLng, alert.userId)
         )
 
         # Commit the changes
