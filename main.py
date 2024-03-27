@@ -84,7 +84,7 @@ async def create_alert(alert: Alert):
         # Insert alert data into the table
         cur.execute(
             """
-            INSERT INTO iot_project (lat, lng, homeLat, homeLng, userId)
+            INSERT INTO iot_project (lat, lng, homeLat, homeLng, userId, datetime)
             VALUES (%s, %s, %s, %s, %s, %s)
             """,
             (alert.lat, alert.lng, alert.homeLat, alert.homeLng, alert.userId, now)
