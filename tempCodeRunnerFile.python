@@ -1,0 +1,44 @@
+import psycopg2
+from psycopg2 import sql
+
+try:
+    # Connect to your postgres DB
+    connection = psycopg2.connect(
+        dbname="postgres",
+        user="postgres",
+        password="BARATHJP",
+        host="localhost",
+        port="5432"
+    )
+
+    # Set autocommit to true
+    connection.autocommit = True
+
+    # Open a cursor to perform database operations
+    cursor = connection.cursor()
+
+    # Execute a query
+    cursor.execute(
+        """
+        ALTER TABLE "IOT_TEST"
+        ADD COLUMN IF NOT EXISTS datetime TIMESTAMP,
+        ADD COLUMN IF NOT EXISTS sensor_value FLOAT
+        """
+    )
+    print("Table altered successfully")
+    cursor.execute("""SELECT * FROM "IOT_TEST" """)
+
+    # Retrieve query results
+    records = cursor.fetchall()
+
+    for i in records:
+        print(i)
+
+except (Exception, psycopg2.Error) as error:
+    print("Error while connecting to PostgreSQL", error)
+
+finally:
+    # Close communication with the database
+    if connection:
+        cursor.close()
+        connection.close()
