@@ -79,20 +79,62 @@ async def create_alert(alert: Alert):
 
         # Open a cursor to perform database operations
         cur = conn.cursor()
+        now = datetime.now()
 
         # Insert alert data into the table
         cur.execute(
             """
             INSERT INTO iot_project (lat, lng, homeLat, homeLng, userId)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (alert.lat, alert.lng, alert.homeLat, alert.homeLng, alert.userId)
+            (alert.lat, alert.lng, alert.homeLat, alert.homeLng, alert.userId, now)
         )
+
 
         # Commit the changes
         conn.commit()
 
         return {"status": "success"}
+
+    except (Exception, psycopg2.Error) as error:
+        return {"status": "error", "detail": str(error)}
+
+    finally:
+        # Close communication with the database
+        if conn:
+            cur.close()
+            conn.close()
+
+@app.get("/latest")
+async def get_latest_alert():
+    conn = None
+    try:
+        # Connect to your postgres DB
+        conn = psycopg2.connect(
+            dbname="postgres",
+            user="postgres",
+            password="BARATHJP",
+            host="localhost",
+            port="5432"
+        )
+
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+
+        # Retrieve the most recently updated row
+        cur.execute(
+            """
+            SELECT * FROM iot_project
+            ORDER BY datetime DESC
+            LIMIT 1
+            """
+        )
+
+        # Fetch the result
+        result = cur.fetchone()
+
+        # Return the result
+        return {"status": "success", "data": result}
 
     except (Exception, psycopg2.Error) as error:
         return {"status": "error", "detail": str(error)}
