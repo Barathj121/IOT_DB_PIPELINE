@@ -110,13 +110,7 @@ async def get_latest_alert():
     conn = None
     try:
         # Connect to your postgres DB
-        conn = psycopg2.connect(
-            dbname="postgres",
-            user="postgres",
-            password="BARATHJP",
-            host="localhost",
-            port="5432"
-        )
+        conn = psycopg2.connect(DATABASE_URL)
 
         # Open a cursor to perform database operations
         cur = conn.cursor()
