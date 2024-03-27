@@ -6,12 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins = ['http://localhost:8000','http://192.168.137.1:8000']
+DATABASE_URL = "dbname=aws_invoice user=aws_invoice_user password=oFsKPV03cSTIvRFwmkEiiJhnc99dNhxp host=dpg-cnu1hgda73kc73f5966g-a.singapore-postgres.render.com port=5432"
+
+
+#origins = ['http://localhost:8000','http://192.168.137.1:8000']
 
 # Allow CORS for all origins during development (replace "*" with your actual frontend URL in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -29,13 +32,7 @@ async def create_sensor_data(sensor: Sensor):
     conn = None
     try:
         # Connect to your postgres DB
-        conn = psycopg2.connect(
-            dbname="postgres",
-            user="postgres",
-            password="BARATHJP",
-            host="localhost",
-            port="5432"
-        )
+        conn=psycopg2.connect(DATABASE_URL)
 
         # Open a cursor to perform database operations
         cur = conn.cursor()
