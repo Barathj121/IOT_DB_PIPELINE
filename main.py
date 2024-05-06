@@ -20,6 +20,7 @@ app.add_middleware(
 class Sensor(BaseModel):
     location_long: float
     location_lat: float
+    source: str
 
 class User(BaseModel):
     home_long: float
@@ -41,10 +42,10 @@ async def create_sensor_data(sensor: Sensor):
         # Insert sensor data and current datetime into the table
         cur.execute(
             """
-            INSERT INTO alert_history (time_stamp, location_long, location_lat)
+            INSERT INTO alert_history (time_stamp, location_long, location_lat, source)
             VALUES (%s, %s, %s)
             """,
-            (now, sensor.location_long, sensor.location_lat)
+            (now, sensor.location_long, sensor.location_lat,sensor.source)
         )
 
         # Commit the changes
