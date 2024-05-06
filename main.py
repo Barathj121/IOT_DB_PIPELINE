@@ -43,7 +43,7 @@ async def create_sensor_data(sensor: Sensor):
         cur.execute(
             """
             INSERT INTO alert_history (time_stamp, location_long, location_lat, source)
-            VALUES (%s, %s, %s)
+            VALUES (%s, %s, %s, %s)
             """,
             (now, sensor.location_long, sensor.location_lat,sensor.source)
         )
