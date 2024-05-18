@@ -126,15 +126,15 @@ class MedicineAlert(BaseModel):
     time: int
     medicine_name: str
 
-@app.get("/medicine_alerts", response_model=List[MedicineAlert])
+@app.get("/medicine_alerts", response_model=MedicineAlert)
 async def get_medicine_alerts():
     conn=None
     try:
         conn = psycopg2.connect(DATABASE_URL)
         cur = conn.cursor()
         cur.execute("""SELECT "time", "medicine_name" FROM "Medicine_Alert" """)
-        results = cur.fetchall()
-        return [{"time": result[0], "medicine_name": result[1]} for result in results]
+        time,medicinename = cur.fetchone()
+        return {"time": time, "medicine_name": medicinename} 
     except (Exception, psycopg2.Error) as error:
         return {"status": "error", "detail": str(error)}
     finally:
