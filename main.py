@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import psycopg2
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -119,4 +121,24 @@ async def get_home_location():
         if conn:
             cur.close()
             conn.close()
- 
+
+class MedicineAlert(BaseModel):
+    time: int
+    medicine_name: str
+
+@app.get("/medicine_alerts", response_model=List[MedicineAlert])
+async def get_medicine_alerts():
+    conn=None
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""SELECT "time", "medicine_name" FROM "Medicine_Alert" """)
+        results = cur.fetchall()
+        return [{"time": result[0], "medicine_name": result[1]} for result in results]
+    except (Exception, psycopg2.Error) as error:
+        return {"status": "error", "detail": str(error)}
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
